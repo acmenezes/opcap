@@ -1,18 +1,54 @@
 package operator
 
+import (
+	"context"
+	"fmt"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+)
+
 // GetPackageManifests
 
 // CreateNamespace
+func CreateNamespace(c *kubernetes.Clientset) {
+
+	OpcapNs := corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{Name: "opcap"},
+		Spec:       corev1.NamespaceSpec{Finalizers: []corev1.FinalizerName{"kubernetes"}},
+	}
+	ns, err := c.CoreV1().Namespaces().Create(context.Background(), &OpcapNs, metav1.CreateOptions{})
+	if err != nil {
+		fmt.Printf("Unable to create Namespace: %s\n", err)
+	}
+	fmt.Printf("Created Namespace: %s\n", ns.ObjectMeta.Name)
+}
 
 // CreateOperatorGroup
+func CreateOperatorGroup(c *kubernetes.Clientset) {
+
+}
 
 // CreateSubscription
+func CreateSubscription() {
+
+}
 
 // ApproveInstallPlan
+func ApproveInstallPlan() {
+
+}
 
 // GetCSVStatus
+func GetCSVStatus() {
+
+}
 
 // OperatorCleanUp
+func OperatorCleanUp() {
+
+}
 
 // // DeleteSubscription
 

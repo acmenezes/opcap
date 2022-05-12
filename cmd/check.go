@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"opcap/internal/operator"
 	"os"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,7 +29,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("check called")
-		GetTest(GetK8sClient())
+		//GetTest(GetK8sClient())
+		operator.CreateNamespace(GetK8sClient())
 	},
 }
 
