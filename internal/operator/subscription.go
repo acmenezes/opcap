@@ -19,6 +19,7 @@ type SubscriptionData struct {
 	Package                string
 	InstallModeType        operatorv1alpha1.InstallModeType
 	InstallPlanApproval    operatorv1alpha1.Approval
+	StartingCSV            string
 }
 
 // SubscriptionList represent the set of operators
@@ -72,6 +73,7 @@ func (c operatorClient) CreateSubscription(ctx context.Context, data Subscriptio
 			Channel:                data.Channel,
 			InstallPlanApproval:    data.InstallPlanApproval,
 			Package:                data.Package,
+			StartingCSV:            data.StartingCSV,
 		},
 	}
 	err := c.Client.Create(ctx, subscription)
