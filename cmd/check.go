@@ -74,22 +74,23 @@ func checkRunE(cmd *cobra.Command, args []string) error {
 }
 
 func runAudits(ctx context.Context, kubeconfig *rest.Config, client operator.Client, fs afero.Fs, reportWriter io.Writer) error {
-	// run all dynamically built audits in the auditor workqueue
-	if err := capability.RunAudits(ctx,
-		capability.WithAuditPlan(checkflags.AuditPlan),
-		capability.WithCatalogSource(checkflags.CatalogSource),
-		capability.WithCatalogSourceNamespace(checkflags.CatalogSourceNamespace),
-		capability.WithPackages(checkflags.Packages),
-		capability.WithAllInstallModes(checkflags.AllInstallModes),
-		capability.WithClient(client),
-		capability.WithExtraCRDirectory(checkflags.ExtraCRDirectory),
-		capability.WithFilesystem(fs),
-		capability.WithTimeout(time.Minute),
-		capability.WithReportWriter(reportWriter),
-		capability.WithDetailedReports(checkflags.DetailedReports),
-	); err != nil {
-		return err
+
+	opts := capability.AuditorOptions{
+		AuditPlan:              checkflags.AuditPlan,
+		CatalogSource:          checkflags.CatalogSource,
+		CatalogSourceNamespace: checkflags.CatalogSourceNamespace,
+		Packages:               checkflags.Packages,
+		AllInstallModes:        checkflags.AllInstallModes,
+		OpCapClient:            client,
+		ExtraCustomResources:   checkflags.ExtraCRDirectory,
+		Fs:                     fs,
+		Timeout:                time.Minute,
+		ReportWriter:           reportWriter,
+		DetailedReports:        checkflags.DetailedReports,
 	}
 
+	if err := capability.RunAudits(ctx, opts); err != nil {
+		return err
+	}
 	return nil
 }

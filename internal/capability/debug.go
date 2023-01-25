@@ -21,7 +21,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CollectDebugData(ctx context.Context, options auditOptions, reportName string) error {
+func CollectDebugData(ctx context.Context, audit *capAudit, reportName string) error {
 	c, err := k8sClientset()
 	if err != nil {
 		return fmt.Errorf("couldn't get clientset for operator install debug report: %s", err.Error())
@@ -29,8 +29,8 @@ func CollectDebugData(ctx context.Context, options auditOptions, reportName stri
 
 	// get CSV events
 	events := []report.Event{}
-	if options.csv != nil {
-		EventList, err := EventsByNameAndKind(ctx, c, options.csv.ObjectMeta.Name, "ClusterServiceVersion", options.namespace)
+	if audit.csv != nil {
+		EventList, err := EventsByNameAndKind(ctx, c, audit.csv.ObjectMeta.Name, "ClusterServiceVersion", audit.namespace)
 		if err != nil {
 			return fmt.Errorf("couldn't get eventList for CSV: %s", err.Error())
 		}
@@ -48,7 +48,7 @@ func CollectDebugData(ctx context.Context, options auditOptions, reportName stri
 		}
 	}
 	// get pods status and events
-	pods, err := OperatorPods(ctx, c, options.namespace)
+	pods, err := OperatorPods(ctx, c, audit.namespace)
 	if err != nil {
 		logger.Infow("couldn't list pods for debug report: %s", err.Error())
 	}
@@ -58,7 +58,7 @@ func CollectDebugData(ctx context.Context, options auditOptions, reportName stri
 	if len(pods.Items) > 0 {
 		for _, pod := range pods.Items {
 
-			EventList, err := EventsByNameAndKind(ctx, c, pod.ObjectMeta.Name, "Pod", options.namespace)
+			EventList, err := EventsByNameAndKind(ctx, c, pod.ObjectMeta.Name, "Pod", audit.namespace)
 			if err != nil {
 				return fmt.Errorf("couldn't get eventList for CSV: %s", err.Error())
 			}
@@ -87,17 +87,17 @@ func CollectDebugData(ctx context.Context, options auditOptions, reportName stri
 		}
 	}
 
-	debugFile, err := options.fs.OpenFile(reportName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	debugFile, err := audit.options.Fs.OpenFile(reportName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
 	defer debugFile.Close()
 
 	err = report.DebugJsonReport(debugFile, report.TemplateData{
-		OcpVersion:   options.ocpVersion,
-		Subscription: *options.subscription,
-		Csv:          options.csv,
-		CsvTimeout:   options.csvTimeout,
+		OcpVersion:   audit.ocpVersion,
+		Subscription: audit.subscription,
+		Csv:          audit.csv,
+		CsvTimeout:   audit.csvTimeout,
 		CsvEvents:    events,
 		PodEvents:    podEvents,
 		PodLogs:      podLogs,
