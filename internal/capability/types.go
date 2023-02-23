@@ -22,6 +22,7 @@ type auditOptions struct {
 	csvWaitTime       time.Duration
 	csv               *v1alpha1.ClusterServiceVersion
 	ocpVersion        string
+	platform          string
 	customResources   []map[string]interface{}
 	operands          []unstructured.Unstructured
 	fs                afero.Fs
@@ -66,6 +67,8 @@ type auditorOptions struct {
 
 	// DetailedReports creates reports containing events and logs
 	detailedReports bool
+
+	platform string
 }
 
 type (

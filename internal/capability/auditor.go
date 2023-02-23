@@ -322,3 +322,9 @@ func WithDetailedReports(detailedReports bool) auditorOption {
 		return nil
 	}
 }
+func WithPlatform(platform string) auditorOption {
+	return func(options *auditorOptions) error {
+		options.platform = platform
+		return nil
+	}
+}

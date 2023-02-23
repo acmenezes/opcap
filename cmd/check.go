@@ -22,6 +22,7 @@ type checkCommandFlags struct {
 	AllInstallModes        bool     `json:"allInstallModes"`
 	ExtraCRDirectory       string   `json:"extraCRDirectory"`
 	DetailedReports        bool     `json:"detailedReports"`
+	Platform               string   `json:"platform"`
 }
 
 var checkflags checkCommandFlags
@@ -53,6 +54,7 @@ and/or users.`,
 	flags.StringVar(&checkflags.ExtraCRDirectory, "extra-cr-directory", "",
 		"directory containing the additional Custom Resources to be deployed by the OperandInstall audit. The manifest files should be located in subdirectories named after the packages they are corresponding to.")
 	flags.BoolVar(&checkflags.DetailedReports, "detailed-reports", false, "when set, a debug report will be created with events and logs for the tests being run")
+	flags.StringVar(&checkflags.Platform, "platform", "OCP", "Tags reports with the chosen platform ARO, ROSA, OCP etc.")
 
 	return cmd
 }
@@ -76,6 +78,7 @@ func checkRunE(cmd *cobra.Command, args []string) error {
 func runAudits(ctx context.Context, kubeconfig *rest.Config, client operator.Client, fs afero.Fs, reportWriter io.Writer) error {
 	// run all dynamically built audits in the auditor workqueue
 	if err := capability.RunAudits(ctx,
+		capability.WithPlatform(checkflags.Platform),
 		capability.WithAuditPlan(checkflags.AuditPlan),
 		capability.WithCatalogSource(checkflags.CatalogSource),
 		capability.WithCatalogSourceNamespace(checkflags.CatalogSourceNamespace),

@@ -14,6 +14,7 @@ import (
 
 type TemplateData struct {
 	OcpVersion      string
+	Platform        string
 	Subscription    operator.SubscriptionData
 	Csv             *operatorv1alpha1.ClusterServiceVersion
 	CsvTimeout      bool
